@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const pageUrl = searchParams.get("pageUrl");
     const queryDomain = searchParams.get("domain");
+    const search = searchParams.get("search");
 
     // Clients can only see images matching their own domain
     const filterDomain = authUser.role === "client" && authUser.domain
@@ -23,6 +24,21 @@ export async function GET(request: Request) {
 
     if (filterDomain) {
       filter.url = { $regex: filterDomain, $options: "i" };
+    }
+    if (search) {
+      const regex = { $regex: search, $options: "i" };
+      filter.$and = filter.$and || [];
+      (filter.$and as any[]).push({
+        $or: [
+          { url: regex },
+          { asset_url: regex },
+          { keywords: regex },
+          { desc: regex },
+          { category: regex },
+          { altText: regex },
+          { source_page: regex },
+        ],
+      });
     }
     if (pageUrl) {
       // Also check image_page_links for the page

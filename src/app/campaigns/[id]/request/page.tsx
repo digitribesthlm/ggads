@@ -91,6 +91,7 @@ export default function CampaignRequestPage() {
   const [pendingChangedHlIds, setPendingChangedHlIds] = useState<Set<string>>(new Set());
   const [markedForRemovalHl, setMarkedForRemovalHl] = useState<Set<string>>(new Set());
   const [markedForRemovalDesc, setMarkedForRemovalDesc] = useState<Set<string>>(new Set());
+  const [cfg, setCfg] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync form when campaign loads
@@ -146,6 +147,14 @@ export default function CampaignRequestPage() {
       })
       .catch(() => {});
   }, [campaignId, campaign]);
+
+  // Fetch config for limits
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((d) => setCfg(d))
+      .catch(() => {});
+  }, []);
 
   // Auth check
   useEffect(() => { if (!user) router.replace("/"); }, [user, router]);
@@ -244,14 +253,6 @@ export default function CampaignRequestPage() {
       </div>
     );
   }
-
-  const [cfg, setCfg] = useState<any>(null);
-  useEffect(() => {
-    fetch("/api/config")
-      .then((r) => r.json())
-      .then((d) => setCfg(d))
-      .catch(() => {});
-  }, []);
 
   const isPMax = campaign.type === "pmax";
   const typeCfg = cfg?.types?.[campaign.type] || {};

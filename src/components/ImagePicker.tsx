@@ -24,21 +24,21 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
   const [tab, setTab] = useState<"page" | "all">("page");
   const [picked, setPicked] = useState<Set<string>>(new Set(selected));
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    // Fetch page images
-    fetch(`/api/images?pageUrl=${encodeURIComponent(pageUrl)}`)
+    const sq = search ? `&search=${encodeURIComponent(search)}` : "";
+    fetch(`/api/images?pageUrl=${encodeURIComponent(pageUrl)}${sq}`)
       .then((r) => r.json())
       .then((d) => setPageImages(d.images || []))
       .catch(() => {});
 
-    // Fetch all domain images
-    fetch(`/api/images?domain=${encodeURIComponent(domain)}`)
+    fetch(`/api/images?domain=${encodeURIComponent(domain)}${sq}`)
       .then((r) => r.json())
       .then((d) => setAllImages(d.images || []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [pageUrl, domain]);
+  }, [pageUrl, domain, search]);
 
   const images = tab === "page" ? pageImages : allImages;
 
@@ -59,6 +59,17 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
             <p className="text-xs text-slate-light mt-0.5">{picked.size} selected</p>
           </div>
           <button onClick={onClose} className="text-slate-light hover:text-slate text-xl leading-none">&times;</button>
+        </div>
+
+        {/* Search */}
+        <div className="px-6 py-3 border-b border-gray-100">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search images..."
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-brand transition-colors"
+          />
         </div>
 
         {/* Tabs */}
