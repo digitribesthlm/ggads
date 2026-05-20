@@ -17,7 +17,7 @@ async function seed() {
 
   const users = [
     {
-      email: "admin@agency.com",
+      email: "admin@example.com",
       passwordHash: await hash("admin123", 12),
       name: "Admin",
       role: "account_manager",

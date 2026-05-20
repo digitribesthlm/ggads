@@ -46,16 +46,16 @@ export default function LoginPage() {
         <div className="relative z-10 max-w-sm px-12">
           <div className="flex items-center gap-3 mb-16">
             <div className="w-1.5 h-1.5 rounded-full bg-brand" />
-            <span className="text-xs font-medium text-white/40 tracking-widest uppercase">AdsPortal</span>
+            <span className="text-xs font-medium text-white/40 tracking-widest uppercase">Portal</span>
           </div>
           <p className="text-3xl font-bold text-white leading-tight mb-6">
             Every headline, every image, every landing page — applied before it goes live.
           </p>
           <p className="text-base text-white/50 leading-relaxed">
-            Creative approval for Google Ads campaigns. Built for agencies that can&apos;t afford mistakes.
+            Campaign management portal. Built for teams that need precision.
           </p>
           <div className="mt-16 pt-8 border-t border-white/10">
-            <p className="text-xs text-white/30">Google Ads creative approval</p>
+            <p className="text-xs text-white/30">Campaign management</p>
             <p className="text-sm text-white/50 mt-1 font-medium">Request. Process. Go live.</p>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="lg:hidden mb-10">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-1.5 h-1.5 rounded-full bg-brand" />
-              <span className="text-xs font-medium text-slate-light/50 tracking-widest uppercase">AdsPortal</span>
+              <span className="text-xs font-medium text-slate-light/50 tracking-widest uppercase">Portal</span>
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@agency.com"
+                  placeholder="you@company.com"
                   className="w-full px-0 py-3 border-0 border-b border-gray-200 text-sm text-slate placeholder:text-slate-light/40 focus:outline-none focus:border-slate transition-colors bg-transparent"
                   autoFocus
                 />

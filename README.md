@@ -1,3 +1,3 @@
-# AdsPortal
+# Portal
 
-Google Ads creative approval portal.
+Client campaign management portal.

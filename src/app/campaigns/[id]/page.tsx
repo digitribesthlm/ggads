@@ -72,7 +72,7 @@ export default function CampaignDetailPage() {
           <h1 className="text-[32px] font-bold text-slate leading-tight mb-3">{campaign.campaignName}</h1>
           <p className="text-[15px] text-slate-light mb-6 leading-relaxed">
             {isPMax
-              ? `Performance Max campaign with ${allAssetGroups.length} asset groups covering data analytics, strategy, planning, cloud migration, and platform services for the Swedish market.`
+              ? `Performance Max campaign with ${allAssetGroups.length} asset groups.`
               : `Search campaign with ${campaign.adGroups.length} ad group${campaign.adGroups.length !== 1 ? "s" : ""}.`}
           </p>
           {isPMax && (

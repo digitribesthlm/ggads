@@ -34,7 +34,7 @@ export function Sidebar() {
           </div>
           <div>
             <div className="text-sm font-bold text-slate tracking-tight">
-              AdsPortal
+              Portal
             </div>
             <div className="text-[11px] text-slate-light">
               {isAccountManager ? "Account Manager" : "Client Portal"}

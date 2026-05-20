@@ -18,7 +18,11 @@ function slug(text: string): string {
 }
 
 async function main() {
-  const csvPath = process.argv[2] || "Climber AB++1_Ad groups+10_Asset groups+2026-05-19_v2.csv";
+  const csvPath = process.argv[2];
+  if (!csvPath) {
+    console.error("Usage: npx tsx scripts/import-csv.ts <csv-path>");
+    process.exit(1);
+  }
   console.log("Reading CSV:", csvPath);
   const text = readCsvUtf16(csvPath);
   const campaigns = parseGoogleAdsCsv(text);

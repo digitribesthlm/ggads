@@ -245,11 +245,21 @@ export default function CampaignRequestPage() {
     );
   }
 
+  const [cfg, setCfg] = useState<any>(null);
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((d) => setCfg(d))
+      .catch(() => {});
+  }, []);
+
   const isPMax = campaign.type === "pmax";
-  const maxHeadlines = 15;   // Google Ads limit for both PMax and Search
-  const maxDescriptions = isPMax ? 5 : 4;  // PMax: 5, Search: 4
-  const headlineSlots = Math.max(headlines.length, isPMax ? 5 : 3);
-  const descSlots = Math.max(descriptions.length, isPMax ? 4 : 2);
+  const typeCfg = cfg?.types?.[campaign.type] || {};
+  const maxHeadlines = typeCfg.maxHeadlines ?? 15;
+  const maxDescriptions = typeCfg.maxDescriptions ?? (isPMax ? 5 : 4);
+  const maxYoutubeUrls = typeCfg.maxYoutubeUrls ?? 20;
+  const headlineSlots = Math.max(headlines.length, typeCfg.minHeadlineSlots ?? (isPMax ? 5 : 3));
+  const descSlots = Math.max(descriptions.length, typeCfg.minDescriptionSlots ?? (isPMax ? 4 : 2));
   const atHeadlineLimit = headlines.length >= maxHeadlines;
   const atDescLimit = descriptions.length >= maxDescriptions;
 
@@ -369,7 +379,7 @@ export default function CampaignRequestPage() {
           );
         })}
         {atHeadlineLimit ? (
-          <p className="mt-2 text-xs text-orange-600">Google Ads limit: {maxHeadlines} headlines maximum for this campaign type.</p>
+          <p className="mt-2 text-xs text-orange-600">Limit: {maxHeadlines} headlines maximum for this campaign type.</p>
         ) : (
           <button onClick={() => { setHeadlineIds([...headlineIds, ""]); setHeadlines([...headlines, ""]); }}
             className="mt-2 px-4 py-2 text-xs text-slate-light border border-dashed border-gray-200 rounded-lg hover:text-brand hover:border-brand">
@@ -438,7 +448,7 @@ export default function CampaignRequestPage() {
           );
         })}
         {atDescLimit ? (
-          <p className="mt-2 text-xs text-orange-600">Google Ads limit: {maxDescriptions} descriptions maximum for this campaign type.</p>
+          <p className="mt-2 text-xs text-orange-600">Limit: {maxDescriptions} descriptions maximum for this campaign type.</p>
         ) : (
           <button onClick={() => { setDescriptionIds([...descriptionIds, ""]); setDescriptions([...descriptions, ""]); }}
             className="mt-2 px-4 py-2 text-xs text-slate-light border border-dashed border-gray-200 rounded-lg hover:text-brand hover:border-brand">
@@ -464,9 +474,9 @@ export default function CampaignRequestPage() {
       <div className="mb-9">
         <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-light mb-3 flex items-center justify-between">
           YouTube URLs
-          <span className={`font-normal normal-case tracking-normal text-xs ${youtubeUrls.length >= 20 ? "text-orange-600 font-semibold" : ""}`}>
-            {youtubeUrls.filter(u => u).length} / 20
-            {youtubeUrls.length >= 20 && " — limit reached"}
+          <span className={`font-normal normal-case tracking-normal text-xs ${youtubeUrls.length >= maxYoutubeUrls ? "text-orange-600 font-semibold" : ""}`}>
+            {youtubeUrls.filter(u => u).length} / {maxYoutubeUrls}
+            {youtubeUrls.length >= maxYoutubeUrls && " — limit reached"}
           </span>
         </div>
         <div className="space-y-3">
@@ -517,8 +527,8 @@ export default function CampaignRequestPage() {
             );
           })}
         </div>
-        {youtubeUrls.length >= 20 ? (
-          <p className="mt-2 text-xs text-orange-600">Google Ads limit: 20 YouTube URLs maximum.</p>
+        {youtubeUrls.length >= maxYoutubeUrls ? (
+          <p className="mt-2 text-xs text-orange-600">Limit: {maxYoutubeUrls} YouTube URLs maximum.</p>
         ) : (
           <button onClick={() => setYoutubeUrls([...youtubeUrls, ""])}
             className="mt-2 px-4 py-2 text-xs text-slate-light border border-dashed border-gray-200 rounded-lg hover:text-brand hover:border-brand">

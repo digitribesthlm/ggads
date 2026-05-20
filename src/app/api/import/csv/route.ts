@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const buffer = await file.arrayBuffer();
     let text: string;
 
-    // Detect and decode UTF-16 LE (Google Ads Editor default)
+    // Detect and decode UTF-16 LE
     if (buffer.byteLength >= 2) {
       const view = new Uint8Array(buffer);
       // UTF-16 LE BOM: FF FE

@@ -119,8 +119,7 @@ export function parseGoogleAdsCsv(csvText: string): ImportedCampaign[] {
     const row = lines[i].split("\t");
     if (row.length < 2) continue;
 
-    // Detect new campaign by Campaign#Original — only set on the first row
-    // of each campaign in Google Ads Editor exports.
+    // Detect new campaign — only set on the first row of each campaign in exports.
     const isNewCampaign = pick(cols.campaignOriginal, row);
 
     if (isNewCampaign) {

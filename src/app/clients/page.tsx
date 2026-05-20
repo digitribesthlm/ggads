@@ -33,20 +33,16 @@ export default function ClientsPage() {
 
   const getEmailTemplate = (email: string, name: string) => {
     const link = getInviteLink(email);
-    return `Subject: Your AdsPortal access — ${email}
+    return `Subject: Your portal access — ${email}
 
 Hi ${name},
 
-You now have access to AdsPortal, where you can review and request changes to your Google Ads campaigns.
+You now have access to the campaign portal, where you can review and request changes.
 
-Click here to sign in (no password needed):
+Sign in here:
 ${link}
 
-This link is unique to you — please do not share it.
-
-Best,
-Alice
-Account Manager`;
+This link is unique to you — please do not share it.`;
   };
 
   const handleCopy = async (text: string, key: string) => {
