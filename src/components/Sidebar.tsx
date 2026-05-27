@@ -12,7 +12,7 @@ export function Sidebar() {
 
   const clientLinks = [
     { href: "/dashboard", label: "Campaigns" },
-    { href: "/my-requests", label: "My Requests" },
+    { href: "/my-requests", label: "My Changes" },
     { href: "/changelog", label: "Change Log" },
   ];
 

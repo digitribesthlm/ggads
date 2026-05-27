@@ -23,7 +23,7 @@ export function LayoutWrapper({ children }: { children: ReactNode }) {
   }
 
   // Redirect non-account-managers away from account-manager pages
-  if (!isAccountManager && (pathname.startsWith("/review") || pathname.startsWith("/clients") || pathname.startsWith("/changelog"))) {
+  if (!isAccountManager && (pathname.startsWith("/review") || pathname.startsWith("/clients"))) {
     router.replace("/dashboard");
     return null;
   }
