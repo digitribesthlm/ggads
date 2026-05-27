@@ -32,12 +32,12 @@ export default function ChangeLogPage() {
   const [entries, setEntries] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user) router.replace("/");
+    if (!user) { router.replace("/"); return; }
     fetch("/api/change-log")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
       .then((data) => setEntries(data || []))
       .catch(() => {});
-  }, [user, router]);
+  }, [user]);
 
   if (!user) return null;
 

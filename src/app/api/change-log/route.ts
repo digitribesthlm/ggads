@@ -6,7 +6,7 @@ const COLL = process.env.COLLECTION_CHANGE_LOG ?? "ggads_change_log";
 
 export async function GET(request: Request) {
   const authUser = await getUserFromRequest(request);
-  if (!authUser || authUser.role !== "account_manager") {
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,7 +16,16 @@ export async function GET(request: Request) {
     const domainParam = searchParams.get("domain");
 
     const filter: Record<string, any> = {};
-    if (domainParam) filter.domain = domainParam;
+
+    // Clients see only their own domain's log entries
+    if (authUser.role === "client" && authUser.domain) {
+      filter.domain = authUser.domain;
+    }
+
+    // Account managers can optionally filter by domain
+    if (authUser.role === "account_manager" && domainParam) {
+      filter.domain = domainParam;
+    }
 
     const entries = await db.collection(COLL).find(filter).sort({ timestamp: -1 }).toArray();
     return NextResponse.json(entries);
