@@ -6,6 +6,7 @@ interface VideoItem {
   _id: string;
   videoId: string;
   url: string;
+  title?: string;
   thumbnailUrl: string;
   channelName?: string;
 }
@@ -154,11 +155,11 @@ export default function VideoPicker({ pageUrl, domain, selected, onSelect, onClo
                       onClick={() => toggle(vid.url)}
                     >
                       <div className="min-w-0">
-                        <div className="text-xs font-medium text-slate truncate">
-                          {vid.videoId}
+                        <div className="text-xs font-medium text-slate truncate leading-tight">
+                          {vid.title || vid.videoId}
                         </div>
                         {vid.channelName && (
-                          <div className="text-[10px] text-slate-light truncate">{vid.channelName}</div>
+                          <div className="text-[10px] text-slate-light truncate mt-0.5">{vid.channelName}</div>
                         )}
                       </div>
                       {isPicked && (
