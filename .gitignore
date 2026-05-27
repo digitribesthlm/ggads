@@ -46,3 +46,5 @@ next-env.d.ts
 MAGE_MONGODB_SCHEMA.mdMAGE_MONGODB_SCHEMA.md
 graphify-out/
 IMAGE_MONGODB_SCHEMA.md
+AGENTS.md
+CLAUDE.md

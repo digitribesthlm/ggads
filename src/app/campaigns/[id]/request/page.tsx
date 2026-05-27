@@ -28,7 +28,7 @@ export default function CampaignRequestPage() {
 
   // Load campaign data
   useEffect(() => {
-    fetch("/api/campaigns/se")
+    fetch(`/api/campaigns/${user?.domain || ".se"}`)
       .then((r) => r.json())
       .then((data) => {
         const campaigns: ImportedCampaign[] = data.campaigns || [];
@@ -57,6 +57,7 @@ export default function CampaignRequestPage() {
           setCampaign({
             id: campaignId,
             clientId: c.accountId,
+            domain: c.domain,
             name: a ? `${c.campaignName} — ${a.name}` : c.campaignName,
             campaignName: c.campaignName,
             assetGroupName: a?.name || "",

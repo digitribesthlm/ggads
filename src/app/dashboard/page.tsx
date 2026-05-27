@@ -88,7 +88,13 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Active</span>
+                      {(camp as any).status === "active" ? (
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Active</span>
+                      ) : (camp as any).status === "paused" ? (
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Paused</span>
+                      ) : (
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Creative</span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5 text-slate-light text-xs">{assetCount}</td>
                     <td className="px-5 py-3.5 hidden sm:table-cell">

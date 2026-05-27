@@ -16,7 +16,7 @@ export default function CampaignDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchCampaign = () => {
-    fetch("/api/campaigns/se")
+    fetch(`/api/campaigns/${user?.domain || ".se"}`)
       .then((r) => r.json())
       .then((data) => {
         const found = (data.campaigns || []).find(

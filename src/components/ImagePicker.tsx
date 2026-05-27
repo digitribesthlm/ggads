@@ -25,6 +25,10 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
   const [picked, setPicked] = useState<Set<string>>(new Set(selected));
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const limit = 50;
 
   useEffect(() => {
     const sq = search ? `&search=${encodeURIComponent(search)}` : "";
@@ -33,14 +37,21 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
       .then((d) => setPageImages(d.images || []))
       .catch(() => {});
 
-    fetch(`/api/images?domain=${encodeURIComponent(domain)}${sq}`)
+    fetch(`/api/images?domain=${encodeURIComponent(domain)}&page=${page}&limit=${limit}${sq}`)
       .then((r) => r.json())
-      .then((d) => setAllImages(d.images || []))
+      .then((d) => {
+        setAllImages(d.images || []);
+        setTotal(d.total || 0);
+        setTotalPages(d.totalPages || 0);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [pageUrl, domain, search]);
+  }, [pageUrl, domain, search, page]);
 
   const images = tab === "page" ? pageImages : allImages;
+
+  // Reset page when search or domain changes
+  useEffect(() => { setPage(1); }, [search, domain]);
 
   const toggle = (url: string) => {
     const next = new Set(picked);
@@ -88,7 +99,7 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
               tab === "all" ? "border-brand text-brand" : "border-transparent text-slate-light hover:text-slate"
             }`}
           >
-            All {domain} ({allImages.length})
+            All {domain} ({total || allImages.length})
           </button>
         </div>
 
@@ -134,6 +145,29 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
             </div>
           )}
         </div>
+
+        {/* Pagination — only for All tab */}
+        {tab === "all" && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 px-6 py-2 border-t border-gray-100">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="px-3 py-1 text-xs rounded-lg border border-gray-200 text-slate-light hover:text-slate hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Prev
+            </button>
+            <span className="text-xs text-slate-light">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="px-3 py-1 text-xs rounded-lg border border-gray-200 text-slate-light hover:text-slate hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">

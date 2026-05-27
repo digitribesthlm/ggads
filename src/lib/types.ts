@@ -1,6 +1,6 @@
 export type CampaignType = "search" | "pmax";
 
-export type CampaignStatus = "active" | "paused";
+export type CampaignStatus = "active" | "paused" | "creative";
 
 export type RequestStatus = "draft" | "pending_review" | "approved" | "rejected";
 
@@ -79,6 +79,7 @@ export interface ImportedCampaign {
   campaignName: string;
   domain: Domain;
   type: CampaignType;
+  status?: CampaignStatus;
   labels: string[];
   adGroups: ImportedAdGroup[];
 }

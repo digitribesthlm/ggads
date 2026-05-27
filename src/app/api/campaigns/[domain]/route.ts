@@ -3,7 +3,8 @@ import { readFileSync } from "fs";
 import { parseGoogleAdsCsv } from "@/lib/csv-import";
 import { getDb } from "@/lib/mongodb";
 import { getUserFromRequest } from "@/lib/auth";
-import type { ImportedCampaign } from "@/lib/types";
+import { isValidDomain } from "@/lib/domains";
+import type { Domain } from "@/lib/types";
 
 function readCsvUtf16(path: string): string {
   const buf = readFileSync(path);
@@ -13,39 +14,72 @@ function readCsvUtf16(path: string): string {
   return new TextDecoder("utf-8").decode(buf);
 }
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ domain: string }> }
+) {
   try {
+    const { domain } = await params;
     const authUser = await getUserFromRequest(request);
+
+    // Validate domain
+    if (!isValidDomain(domain)) {
+      return NextResponse.json(
+        { error: "Invalid domain", validDomains: [".se", ".fi", ".nl", ".uk"] },
+        { status: 400 }
+      );
+    }
+
+    // Client users can only access their own domain
+    if (authUser && authUser.role === "client") {
+      if (authUser.domain && authUser.domain !== domain) {
+        return NextResponse.json(
+          { error: "Access denied — your account is scoped to a different country" },
+          { status: 403 }
+        );
+      }
+    }
 
     const db = await getDb();
     const campaignCollName = process.env.COLLECTION_CAMPAIGNS ?? "ggads_campaigns";
     const campaignsColl = db.collection(campaignCollName);
     const docCount = await campaignsColl.countDocuments();
 
-    let swedish: any[];
+    let campaigns: any[];
 
     if (docCount > 0) {
-      // Clients see only their campaigns; account managers see all
-      const filter: Record<string, any> = {};
+      // Build filter: domain + optional client scoping
+      const filter: Record<string, any> = { domain };
+
+      // Client users see only their client's campaigns
       if (authUser && authUser.role === "client" && authUser.clientId) {
         filter.clientId = authUser.clientId;
       }
+
       const docs = await campaignsColl.find(filter).toArray();
-      swedish = docs.map((doc) => {
+      campaigns = docs.map((doc) => {
         const { _id, updatedAt, ...campaign } = doc as any;
         return campaign;
       });
     } else {
+      // First boot — import from CSV (Sweden only for legacy support)
+      if (domain !== ".se") {
+        return NextResponse.json(
+          { campaigns: [], note: `No campaigns imported yet for ${domain}. Import a CSV or populate via admin panel.` },
+          { status: 200 }
+        );
+      }
+
       const csvPath =
         process.env.CSV_PMAX_PATH ??
         "Brand AB++1_Ad groups+10_Asset groups+2026-05-19_v2.csv";
       const text = readCsvUtf16(csvPath);
-      const campaigns = parseGoogleAdsCsv(text);
-      swedish = campaigns.filter((c: any) => c.domain === ".se");
+      const imported = parseGoogleAdsCsv(text);
+      campaigns = imported.filter((c: any) => c.domain === ".se");
     }
 
-    // Normalize: extract text from {id, text} objects, generate stable IDs where missing
-    swedish = swedish.map((c: any) => ({
+    // Normalize: convert {id, text} objects to arrays
+    campaigns = campaigns.map((c: any) => ({
       ...c,
       adGroups: (c.adGroups || []).map((ag: any) => ({
         ...ag,
@@ -76,19 +110,27 @@ export async function GET(request: Request) {
       })),
     }));
 
-    // Merge pending creative requests into campaign data
+    // Derive campaign status from asset group states
+    campaigns = campaigns.map((c: any) => {
+      const allAssetGroups = (c.adGroups || []).flatMap((ag: any) => ag.assetGroups || []);
+      const hasLiveAssetGroup = allAssetGroups.some(
+        (asg: any) => asg.status === "Enabled" && asg.approvalStatus === "Approved"
+      );
+      return { ...c, status: hasLiveAssetGroup ? "active" : "creative" };
+    });
+
+    // Merge pending creative requests
     const reqCollName = process.env.COLLECTION_CREATIVE_REQUESTS ?? "ggads_creative_requests";
     const pendingReqs = await db.collection(reqCollName)
       .find({ status: "pending_review" })
       .toArray();
 
     for (const req of pendingReqs) {
-      for (const campaign of swedish) {
+      for (const campaign of campaigns) {
         for (const ag of campaign.adGroups || []) {
           for (const asg of ag.assetGroups || []) {
             const asgId = asg.id || `${campaign.campaignName}__${asg.name}`;
             if (asgId === req.campaignId) {
-              // Save originals before merging
               asg._originalHeadlines = [...(asg.headlines || [])];
               asg._originalHeadlineIds = [...(asg.headlineIds || [])];
               asg._originalDescriptions = [...(asg.descriptions || [])];
@@ -99,10 +141,7 @@ export async function GET(request: Request) {
               const changedDesc: string[] = [];
               const removedHl: string[] = [];
               const removedDesc: string[] = [];
-              let changedUrl = false;
-              let changedYoutube = false;
 
-              // Build ID→text map from live data
               const liveHlById = new Map<string, string>();
               (asg.headlineIds || []).forEach((id: string, i: number) => {
                 liveHlById.set(id, (asg.headlines || [])[i] || "");
@@ -112,13 +151,9 @@ export async function GET(request: Request) {
                 const reqHlIds: string[] = req.headlineIds;
                 const reqHlTexts: string[] = req.headlines;
                 const reqIdSet = new Set(reqHlIds.filter(Boolean));
-
-                // Detect removals: live IDs not in request
                 for (const [id] of liveHlById) {
                   if (!reqIdSet.has(id)) removedHl.push(id);
                 }
-
-                // Build new headlines + IDs from request
                 const newHlTexts: string[] = [];
                 const newHlIds: string[] = [];
                 for (let i = 0; i < reqHlTexts.length; i++) {
@@ -139,7 +174,6 @@ export async function GET(request: Request) {
                 asg.headlines = newHlTexts;
               }
 
-              // Same for descriptions
               const liveDescById = new Map<string, string>();
               (asg.descriptionIds || []).forEach((id: string, i: number) => {
                 liveDescById.set(id, (asg.descriptions || [])[i] || "");
@@ -173,17 +207,12 @@ export async function GET(request: Request) {
               }
               if (req.landingPageUrl && req.landingPageUrl !== asg.finalUrl) {
                 asg.finalUrl = req.landingPageUrl;
-                changedUrl = true;
               }
               if (req.youtubeUrls?.length > 0) {
                 const liveYt = (asg as any).youtubeUrls || ((asg as any).youtubeUrl ? [(asg as any).youtubeUrl] : []);
                 const reqYt: string[] = req.youtubeUrls;
-                const ytChanged = liveYt.length !== reqYt.length || reqYt.some((url: string, i: number) => url !== liveYt[i]);
-                if (ytChanged) {
-                  (asg as any)._originalYoutubeUrls = [...liveYt];
-                  (asg as any).youtubeUrls = reqYt;
-                  changedYoutube = true;
-                }
+                (asg as any)._originalYoutubeUrls = [...liveYt];
+                (asg as any).youtubeUrls = reqYt;
               }
               if (req.imageUrls?.length > 0) {
                 asg._originalImages = [...(asg.assignedImages || [])];
@@ -194,8 +223,6 @@ export async function GET(request: Request) {
               asg._changedDescriptionIds = changedDesc;
               asg._removedHeadlineIds = removedHl;
               asg._removedDescriptionIds = removedDesc;
-              asg._changedUrl = changedUrl;
-              (asg as any)._changedYoutube = changedYoutube;
               asg._pendingRequest = true;
               asg._pendingReqId = req._id?.toString();
             }
@@ -204,19 +231,18 @@ export async function GET(request: Request) {
       }
     }
 
-    // Enrich asset groups with images from MongoDB
+    // Enrich with images
     const imageCollName = process.env.COLLECTION_PAGE_IMAGE_ASSIGNMENTS ?? "ggads_page_image_assignments";
     const assignments = db.collection(imageCollName);
 
     const enriched = await Promise.all(
-      swedish.map(async (campaign: any) => ({
+      campaigns.map(async (campaign: any) => ({
         ...campaign,
         adGroups: await Promise.all(
           (campaign.adGroups || []).map(async (ag: any) => ({
             ...ag,
             assetGroups: await Promise.all(
               (ag.assetGroups || []).map(async (asset: any) => {
-                // Skip image lookup if pending images already set
                 if (asset._pendingRequest && asset.assignedImages?.length > 0) {
                   return asset;
                 }
@@ -237,7 +263,12 @@ export async function GET(request: Request) {
       }))
     );
 
-    return NextResponse.json({ campaigns: enriched });
+    // Include user domain info for the frontend
+    return NextResponse.json({
+      campaigns: enriched,
+      domain,
+      userDomain: authUser?.domain || null,
+    });
   } catch (error) {
     console.error("Campaigns API error:", error);
     return NextResponse.json(
