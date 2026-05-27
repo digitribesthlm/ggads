@@ -162,7 +162,7 @@ export function parseGoogleAdsCsv(csvText: string): ImportedCampaign[] {
     const adGroupName = pick(cols.adGroup, row);
 
     // New ad group
-    if (adGroupName && currentAdGroup?.name !== adGroupName) {
+    if (adGroupName && (currentAdGroup as any)?.name !== adGroupName) {
       const adLabels = pick(cols.labels, row)
         .split(";")
         .map((l) => l.trim())
@@ -200,9 +200,10 @@ export function parseGoogleAdsCsv(csvText: string): ImportedCampaign[] {
         ? makeSlug(currentCampaign.campaignName, assetGroupName)
         : undefined;
 
-      const existing = currentAdGroup.assetGroups.find((ag) => ag.name === assetGroupName);
+      const ag = currentAdGroup!;
+      const existing = ag.assetGroups.find((ag) => ag.name === assetGroupName);
       if (!existing) {
-        currentAdGroup.assetGroups.push({
+        ag.assetGroups.push({
           name: assetGroupName,
           headlines,
           longHeadlines,

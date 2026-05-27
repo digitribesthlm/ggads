@@ -84,7 +84,7 @@ export default function ChangeLogPage() {
           </div>
         ) : (
           filtered.map((entry) => {
-            const style = actionStyles[entry.action] || actionStyles.done;
+            const style = (actionStyles as any)[entry.action] || actionStyles.done;
             return (
               <div
                 key={entry.id}

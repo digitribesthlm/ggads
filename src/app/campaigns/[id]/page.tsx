@@ -100,7 +100,7 @@ export default function CampaignDetailPage() {
       {/* Search campaign */}
       {!isPMax && (
         <div className="space-y-4">
-          {campaign.adGroups.map((ag) => (
+          {campaign.adGroups.map((ag: any) => (
             <div key={ag.name} className="bg-white border border-gray-200 rounded-2xl p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
