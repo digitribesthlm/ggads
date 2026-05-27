@@ -37,7 +37,7 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
       .then((d) => setPageImages(d.images || []))
       .catch(() => {});
 
-    fetch(`/api/images?domain=${encodeURIComponent(domain)}&page=${page}&limit=${limit}${sq}`)
+    fetch(`/api/images?page=${page}&limit=${limit}${sq}`)
       .then((r) => r.json())
       .then((d) => {
         setAllImages(d.images || []);
@@ -99,7 +99,7 @@ export default function ImagePicker({ pageUrl, domain, selected, onSelect, onClo
               tab === "all" ? "border-brand text-brand" : "border-transparent text-slate-light hover:text-slate"
             }`}
           >
-            All {domain} ({total || allImages.length})
+            All images ({total || allImages.length})
           </button>
         </div>
 
