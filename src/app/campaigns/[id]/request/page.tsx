@@ -4,6 +4,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
 import ImagePicker from "@/components/ImagePicker";
+import VideoPicker from "@/components/VideoPicker";
 import Link from "next/link";
 import type { ImportedCampaign } from "@/lib/types";
 
@@ -88,6 +89,7 @@ export default function CampaignRequestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [videoPickerOpen, setVideoPickerOpen] = useState(false);
   const [pendingReq, setPendingReq] = useState<any>(null);
   const [pendingChangedHlIds, setPendingChangedHlIds] = useState<Set<string>>(new Set());
   const [markedForRemovalHl, setMarkedForRemovalHl] = useState<Set<string>>(new Set());
@@ -230,6 +232,11 @@ export default function CampaignRequestPage() {
   const handleImageSelect = (urls: string[]) => {
     setImageUrls((prev) => [...prev, ...urls.filter((u) => !prev.includes(u))]);
     setPickerOpen(false);
+  };
+
+  const handleVideoSelect = (urls: string[]) => {
+    setYoutubeUrls((prev) => [...prev, ...urls.filter((u) => !prev.includes(u))]);
+    setVideoPickerOpen(false);
   };
 
   if (!user) return null;
@@ -539,6 +546,10 @@ export default function CampaignRequestPage() {
             + Add YouTube URL
           </button>
         )}
+        <button onClick={() => setVideoPickerOpen(true)}
+          className="mt-2 px-4 py-2 border border-brand text-brand rounded-lg text-xs font-semibold bg-white hover:bg-brand-light transition-colors">
+          Browse Library
+        </button>
       </div>
 
       {/* Images */}
@@ -588,6 +599,16 @@ export default function CampaignRequestPage() {
           selected={imageUrls}
           onSelect={handleImageSelect}
           onClose={() => setPickerOpen(false)}
+        />
+      )}
+
+      {videoPickerOpen && (
+        <VideoPicker
+          pageUrl={landingPageUrl || campaign.landingPageUrl || ""}
+          domain={campaign.domain || ".se"}
+          selected={youtubeUrls}
+          onSelect={handleVideoSelect}
+          onClose={() => setVideoPickerOpen(false)}
         />
       )}
     </div>
