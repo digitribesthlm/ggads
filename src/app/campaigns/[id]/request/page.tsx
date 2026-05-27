@@ -112,7 +112,8 @@ export default function CampaignRequestPage() {
 
   // Fetch pending request for this asset group
   useEffect(() => {
-    fetch("/api/creative-requests")
+    const domain = user?.domain || ".se";
+    fetch(`/api/creative-requests?domain=${domain}`)
       .then((r) => r.json())
       .then((data: any[]) => {
         const pending = data.find(
@@ -183,6 +184,7 @@ export default function CampaignRequestPage() {
       campaignId,
       campaignName: campaign?.campaignName || "",
       clientId: campaign?.clientId || "",
+      domain: campaign?.domain || "",
       headlineIds: submittedHlIds,
       headlines: submittedHl,
       descriptionIds: submittedDescIds,

@@ -42,6 +42,7 @@ export interface CreativeRequest {
   id: string;
   campaignId: string;
   clientId: string;
+  domain?: Domain;
   // Proposed state — each position has an ID and text. IDs match the live asset group's headlineIds/descriptionIds.
   // Missing IDs (present in live but not in the request) = removed. Empty IDs = new headlines/descriptions.
   headlineIds: string[];
@@ -64,6 +65,8 @@ export interface ChangeLogEntry {
   requestId: string;
   campaignId: string;
   campaignName: string;
+  domain?: string;
+  clientId?: string;
   actor: string;
   actorEmail: string;
   action: "submitted" | "done" | "changes_needed";

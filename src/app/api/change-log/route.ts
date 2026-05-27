@@ -12,7 +12,13 @@ export async function GET(request: Request) {
 
   try {
     const db = await getDb();
-    const entries = await db.collection(COLL).find().sort({ timestamp: -1 }).toArray();
+    const { searchParams } = new URL(request.url);
+    const domainParam = searchParams.get("domain");
+
+    const filter: Record<string, any> = {};
+    if (domainParam) filter.domain = domainParam;
+
+    const entries = await db.collection(COLL).find(filter).sort({ timestamp: -1 }).toArray();
     return NextResponse.json(entries);
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

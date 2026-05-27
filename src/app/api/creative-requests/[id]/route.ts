@@ -35,6 +35,8 @@ export async function PATCH(
       requestId: id,
       campaignId: result.campaignId,
       campaignName: result.campaignName || "",
+      domain: result.domain || "",
+      clientId: result.clientId || "",
       actor: body.reviewedBy || "account_manager",
       actorEmail: body.reviewedBy || "",
       action: body.status === "approved" ? "done" : "changes_needed",
@@ -48,7 +50,9 @@ export async function PATCH(
     if (body.status === "approved") {
       const campaignCollName = process.env.COLLECTION_CAMPAIGNS ?? "ggads_campaigns";
       const campaignsColl = db.collection(campaignCollName);
-      const allCampaigns = await campaignsColl.find({}).toArray();
+      const filter: Record<string, any> = {};
+      if (result.domain) filter.domain = result.domain;
+      const allCampaigns = await campaignsColl.find(filter).toArray();
 
       for (const campaign of allCampaigns) {
         let updated = false;

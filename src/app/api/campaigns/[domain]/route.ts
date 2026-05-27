@@ -119,10 +119,10 @@ export async function GET(
       return { ...c, status: hasLiveAssetGroup ? "active" : "creative" };
     });
 
-    // Merge pending creative requests
+    // Merge pending creative requests — scoped to current domain
     const reqCollName = process.env.COLLECTION_CREATIVE_REQUESTS ?? "ggads_creative_requests";
     const pendingReqs = await db.collection(reqCollName)
-      .find({ status: "pending_review" })
+      .find({ status: "pending_review", domain })
       .toArray();
 
     for (const req of pendingReqs) {
