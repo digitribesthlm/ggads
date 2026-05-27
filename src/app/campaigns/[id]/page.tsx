@@ -112,7 +112,7 @@ export default function CampaignDetailPage() {
                 href={`/campaigns/${encodeURIComponent((ag.assetGroups[0] as any)?.id || `${campaign.campaignName}__${ag.assetGroups[0]?.name || ag.name}`)}/request`}
                 className="inline-flex px-5 py-2.5 bg-slate text-white rounded-xl text-sm font-semibold hover:bg-slate/90 transition-colors"
               >
-                Request Change
+                Edit Creative
               </Link>
             </div>
           ))}

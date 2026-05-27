@@ -39,11 +39,11 @@ export async function PATCH(
       clientId: result.clientId || "",
       actor: body.reviewedBy || "account_manager",
       actorEmail: body.reviewedBy || "",
-      action: body.status === "approved" ? "done" : "changes_needed",
+      action: body.status === "approved" ? "approved" : "changes_requested",
       timestamp: new Date().toISOString(),
       summary: body.status === "approved"
-        ? `Done — Request #${id}`
-        : `Changes needed — Request #${id}${body.rejectionReason ? ` — ${body.rejectionReason}` : ""}`,
+        ? `Approved — Change #${id}`
+        : `Changes requested — Change #${id}${body.rejectionReason ? ` — ${body.rejectionReason}` : ""}`,
     });
 
     // On approval, apply changes to the campaign data

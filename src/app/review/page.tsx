@@ -218,7 +218,7 @@ export default function ReviewPage() {
         </button>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-1">
-          Request #{selectedReq.id}
+          Change #{selectedReq.id}
         </h1>
         <p className="text-sm text-gray-500 mb-8">
           Campaign: <strong>{displayName}</strong> ({displayType === "search" ? "Search" : "Performance Max"})
@@ -485,7 +485,7 @@ export default function ReviewPage() {
             }}
             className="px-6 py-3 bg-green-700 text-white rounded-xl text-sm font-semibold hover:bg-green-800 transition-colors"
           >
-            Mark Done
+            Approve
           </button>
           <button
             onClick={async () => {
@@ -506,7 +506,7 @@ export default function ReviewPage() {
             }}
             className="px-6 py-3 border border-red-300 text-red-700 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors"
           >
-            Changes Needed
+            Request Changes
           </button>
         </div>
       </div>
@@ -520,7 +520,7 @@ export default function ReviewPage() {
         Pending Changes
       </h1>
       <p className="text-sm text-gray-500 mb-8">
-        Apply requested changes to campaigns.
+        Review and apply proposed changes.
       </p>
 
       {pending.length > 0 && (
@@ -548,7 +548,7 @@ export default function ReviewPage() {
                 >
                   <div>
                     <div className="font-semibold text-gray-900 text-sm">
-                      Request #{req.id} — {campName}
+                      Change #{req.id} — {campName}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {req.submittedBy} &middot;{" "}
@@ -567,7 +567,7 @@ export default function ReviewPage() {
                     onClick={() => setSelectedReq(req)}
                     className="px-4 py-2 bg-brand text-white rounded-xl text-xs font-semibold hover:bg-brand-hover transition-colors shrink-0"
                   >
-                    Process
+                    Review
                   </button>
                 </div>
               );
@@ -580,7 +580,7 @@ export default function ReviewPage() {
         <div>
           <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-gray-400" />
-            Done ({processed.length})
+            Reviewed ({processed.length})
           </h2>
           <div className="space-y-2">
             {processed.map((req) => {
@@ -592,10 +592,10 @@ export default function ReviewPage() {
                 >
                   <div>
                     <div className="font-semibold text-gray-900 text-sm">
-                      Request #{req.id} — {campName}
+                      Change #{req.id} — {campName}
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5">
-                      {req.submittedBy} &middot; Processed by {req.reviewedBy}
+                      {req.submittedBy} &middot; Reviewed by {req.reviewedBy}
                     </div>
                   </div>
                   <span
@@ -605,7 +605,7 @@ export default function ReviewPage() {
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {req.status === "approved" ? "Done" : "Changes Needed"}
+                    {req.status === "approved" ? "Approved" : "Changes Requested"}
                   </span>
                 </div>
               );

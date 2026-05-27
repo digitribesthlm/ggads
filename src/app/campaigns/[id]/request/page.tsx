@@ -254,8 +254,8 @@ export default function CampaignRequestPage() {
         <Link href="/dashboard" className="text-[13px] text-slate-light hover:text-slate mb-8 inline-block">&larr; Campaigns</Link>
         <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center">
           <div className="text-3xl mb-4">&#10003;</div>
-          <h2 className="text-xl font-bold text-slate mb-2">Change Request Submitted</h2>
-          <p className="text-sm text-slate-light mb-6">Your changes are pending.</p>
+          <h2 className="text-xl font-bold text-slate mb-2">Changes Submitted for Review</h2>
+          <p className="text-sm text-slate-light mb-6">Your changes are pending review.</p>
           <Link href="/dashboard" className="inline-block px-5 py-2.5 bg-brand text-white rounded-xl text-sm font-semibold hover:bg-brand-hover transition-colors">
             Back to Campaigns
           </Link>
@@ -311,7 +311,7 @@ export default function CampaignRequestPage() {
               }}
               className="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
             >
-              Cancel Request
+              Cancel
             </button>
           </div>
         </div>
@@ -584,7 +584,7 @@ export default function CampaignRequestPage() {
       <div className="flex gap-3 pt-8 border-t border-gray-200">
         <button onClick={handleSubmit} disabled={submitting}
           className="px-7 py-3 bg-brand text-white rounded-[10px] text-sm font-semibold hover:bg-brand-hover transition-colors disabled:opacity-50">
-          {submitting ? "Submitting..." : "Submit Change Request"}
+          {submitting ? "Submitting..." : "Submit for Review"}
         </button>
         <Link href="/dashboard"
           className="px-7 py-3 bg-white border border-gray-200 text-slate-light rounded-[10px] text-sm font-semibold hover:bg-warm-gray transition-colors">

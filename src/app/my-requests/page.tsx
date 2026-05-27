@@ -45,16 +45,16 @@ export default function MyRequestsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">My Requests</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-1">My Changes</h1>
       <p className="text-sm text-gray-500 mb-8">
-        Track the status of your creative change requests.
+        Track the status of your creative changes.
       </p>
 
       {myRequests.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
           <div className="text-3xl mb-3 text-gray-300">&#9998;</div>
           <p className="text-sm text-gray-500 mb-4">
-            You haven&apos;t submitted any change requests yet.
+            No changes submitted yet.
           </p>
           <Link
             href="/dashboard"
@@ -88,7 +88,7 @@ export default function MyRequestsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <div className="font-semibold text-gray-900 text-sm">
-                      Request #{req.id}
+                      Change #{req.id}
                     </div>
                     <div className="text-xs text-gray-500">
                       Campaign: {getCampaignName(req.campaignId)}
@@ -98,11 +98,11 @@ export default function MyRequestsPage() {
                     className={`inline-block px-3 py-0.5 rounded-full text-xs font-semibold ${statusStyle(req.status)}`}
                   >
                     {req.status === "pending_review"
-                      ? "Pending"
+                      ? "Awaiting Review"
                       : req.status === "approved"
-                        ? "Done"
+                        ? "Approved"
                         : req.status === "rejected"
-                          ? "Changes Needed"
+                          ? "Changes Requested"
                           : "Draft"}
                   </span>
                 </div>

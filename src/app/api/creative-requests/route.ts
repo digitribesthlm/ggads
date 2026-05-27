@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       actorEmail: doc.submittedBy || "",
       action: "submitted",
       timestamp: new Date().toISOString(),
-      summary: `Submitted — Request #${result.insertedId}`,
+      summary: `Submitted — Change #${result.insertedId}`,
     });
 
     return NextResponse.json({ ...doc, _id: result.insertedId }, { status: 201 });

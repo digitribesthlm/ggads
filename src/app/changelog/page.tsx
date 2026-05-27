@@ -11,17 +11,17 @@ const actionStyles = {
     color: "text-blue-700",
     label: "submitted",
   },
-  done: {
+  approved: {
     icon: "✓",
     bg: "bg-green-100",
     color: "text-green-700",
-    label: "done",
+    label: "approved",
   },
-  changes_needed: {
+  changes_requested: {
     icon: "↩",
     bg: "bg-amber-100",
     color: "text-amber-700",
-    label: "changes needed",
+    label: "changes requested",
   },
 };
 
@@ -84,7 +84,7 @@ export default function ChangeLogPage() {
           </div>
         ) : (
           filtered.map((entry) => {
-            const style = (actionStyles as any)[entry.action] || actionStyles.done;
+            const style = (actionStyles as any)[entry.action] || actionStyles.approved;
             return (
               <div
                 key={entry.id}
@@ -102,7 +102,7 @@ export default function ChangeLogPage() {
                     <span className="font-semibold text-gray-900">
                       {style.label}
                     </span>{" "}
-                    Request #{entry.requestId}
+                    Change #{entry.requestId}
                   </div>
                   <div className="text-xs text-gray-500 mt-0.5">
                     Campaign: {entry.campaignName} &middot;{" "}
